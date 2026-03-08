@@ -87,38 +87,31 @@ docker build -t ttsaver .
 docker run --env-file .env ttsaver
 ```
 
-## Northflank Sandbox
+## Render Deploy
 
-Recommended deploy target for this MVP: Northflank Sandbox.
+Recommended deploy path right now: Render with a keepalive workaround.
 
-Why:
+How this project is adapted for Render:
 
-- the bot is a long-running polling process
-- it does not need inbound HTTP traffic
-- Northflank Sandbox is positioned as always-on
-- Docker deployment fits the `ffmpeg` requirement cleanly
+- the bot still uses Telegram polling
+- the app now exposes `GET /healthz`
+- Render can run it as a Docker-based `web` service
+- an external monitor can ping `/healthz` every 10 minutes to prevent idle sleep on the free tier
 
-Recommended service type:
+Files:
 
-- create a `combined service`
-- build from Git with `Dockerfile`
-- do not expose any public ports
+- [render.yaml](/Users/lilmir/Documents/ttsaver/render.yaml)
+- [DEPLOY_RENDER.md](/Users/lilmir/Documents/ttsaver/DEPLOY_RENDER.md)
 
-Detailed instructions:
-
-- [DEPLOY_NORTHFLANK.md](/Users/lilmir/Documents/ttsaver/DEPLOY_NORTHFLANK.md)
-
-Important operational note:
+Operational note:
 
 - SQLite cache in `./data/app.db` is local to the container filesystem
 - after redeploy or container replacement, cache can be lost
 - this is acceptable for the current MVP because the cache is only an optimization
 
-## Render Fallback
+## Northflank Alternative
 
-Render remains a valid fallback option, but it is less attractive for a polling bot because free services can sleep after inactivity.
-
-If you still want Render, the repo already includes [render.yaml](/Users/lilmir/Documents/ttsaver/render.yaml) for a Docker-based worker deployment.
+Northflank is still documented in [DEPLOY_NORTHFLANK.md](/Users/lilmir/Documents/ttsaver/DEPLOY_NORTHFLANK.md), but in practice account billing may still block service creation before you can use Sandbox.
 
 ## Before Deploy
 
@@ -127,4 +120,5 @@ If you still want Render, the repo already includes [render.yaml](/Users/lilmir/
 - make sure the bot token belongs to the correct BotFather bot
 - set correct whitelist/admin IDs
 - run a few real TikTok and Reel manual tests because `yt-dlp` behavior changes over time
+- configure a keepalive monitor for `/healthz` if using Render free tier
 - push the project to a Git remote before deploying to Northflank or Render

@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     ffmpeg_path: str = Field(default="ffmpeg", alias="FFMPEG_PATH")
     download_timeout_sec: int = Field(default=180, alias="DOWNLOAD_TIMEOUT_SEC")
     ffmpeg_timeout_sec: int = Field(default=180, alias="FFMPEG_TIMEOUT_SEC")
+    health_host: str = Field(default="0.0.0.0", alias="HEALTH_HOST")
+    port: int = Field(default=10000, alias="PORT")
 
     @field_validator("allowed_user_ids_raw", "admin_user_ids_raw", mode="before")
     @classmethod
