@@ -9,6 +9,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import FSInputFile, Message
 
 from app import texts
+from app.handlers.access_utils import build_access_denied_text
 from app.services.auth import AuthService
 from app.services.cache import CacheService
 from app.services.downloader import DownloaderError, DownloaderService
@@ -46,7 +47,9 @@ def build_links_router(
             return
 
         if not user or not auth_service.is_allowed(user.id):
-            await message.answer(texts.NOT_ALLOWED_TEXT)
+            await message.answer(
+                texts.REQUEST_ACCESS_PROMPT_TEXT if not user else build_access_denied_text(auth_service, user.id)
+            )
             return
 
         original_url = extract_first_url(text)

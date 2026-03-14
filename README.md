@@ -1,6 +1,6 @@
 # ttsaver
 
-Private Telegram bot for saving public TikTok videos and Instagram Reels for a small whitelist of trusted users.
+Private Telegram bot for saving public TikTok videos and Instagram Reels for approved Telegram users.
 
 ## Stack
 
@@ -13,12 +13,12 @@ Private Telegram bot for saving public TikTok videos and Instagram Reels for a s
 ## Features
 
 - direct-message Telegram bot
-- whitelist by Telegram `user_id`
+- access request flow with admin approval via `/req_permission`
 - support only for public TikTok and Instagram Reel links
 - temporary SQLite cache with Telegram `file_id` reuse
 - per-user daily rate limit
 - one active download per user
-- commands: `/start`, `/help`, `/stats`
+- commands: `/start`, `/help`, `/req_permission`, `/stats`
 - startup and per-request cleanup of temporary files
 - clear error for oversized videos above the 50 MB Telegram bot limit
 
@@ -56,13 +56,14 @@ python -m app.main
 Main environment variables:
 
 - `BOT_TOKEN`: Telegram bot token
-- `ALLOWED_USER_IDS`: comma-separated whitelist
 - `ADMIN_USER_IDS`: comma-separated admin IDs for `/stats`
+- `ACCESS_REQUEST_COOLDOWN_HOURS`: cooldown after rejection, default `24`
 - `DB_PATH`: SQLite database path
 - `TEMP_DIR`: temporary working directory for downloads
 - `MAX_VIDEO_SIZE_MB`: max upload size, default `50`
 - `CACHE_TTL_HOURS`: cache TTL, default `72`
 - `REQUESTS_PER_USER_PER_DAY`: per-user daily quota
+- `ALLOWED_USER_IDS`: optional legacy fallback for already trusted users during migration
 
 ## Behavior Notes
 
@@ -118,7 +119,7 @@ Northflank is still documented in [DEPLOY_NORTHFLANK.md](/Users/lilmir/Documents
 - create a real `.env`
 - verify `ffmpeg` is available on the host
 - make sure the bot token belongs to the correct BotFather bot
-- set correct whitelist/admin IDs
+- set correct admin IDs
 - run a few real TikTok and Reel manual tests because `yt-dlp` behavior changes over time
 - configure a keepalive monitor for `/healthz` if using Render free tier
 - push the project to a Git remote before deploying to Northflank or Render

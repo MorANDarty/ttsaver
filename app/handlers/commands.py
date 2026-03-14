@@ -5,6 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from app import texts
+from app.handlers.access_utils import build_access_denied_text
 from app.services.auth import AuthService
 from app.services.cache import CacheService
 
@@ -15,14 +16,22 @@ def build_commands_router(auth_service: AuthService, cache_service: CacheService
     @router.message(Command("start"))
     async def start_handler(message: Message) -> None:
         if not message.from_user or not auth_service.is_allowed(message.from_user.id):
-            await message.answer(texts.NOT_ALLOWED_TEXT)
+            await message.answer(
+                texts.REQUEST_ACCESS_PROMPT_TEXT
+                if not message.from_user
+                else build_access_denied_text(auth_service, message.from_user.id)
+            )
             return
         await message.answer(texts.START_TEXT)
 
     @router.message(Command("help"))
     async def help_handler(message: Message) -> None:
         if not message.from_user or not auth_service.is_allowed(message.from_user.id):
-            await message.answer(texts.NOT_ALLOWED_TEXT)
+            await message.answer(
+                texts.REQUEST_ACCESS_PROMPT_TEXT
+                if not message.from_user
+                else build_access_denied_text(auth_service, message.from_user.id)
+            )
             return
         await message.answer(texts.HELP_TEXT)
 
@@ -46,7 +55,11 @@ def build_commands_router(auth_service: AuthService, cache_service: CacheService
     @router.message(F.text.startswith("/"))
     async def unknown_command_handler(message: Message) -> None:
         if not message.from_user or not auth_service.is_allowed(message.from_user.id):
-            await message.answer(texts.NOT_ALLOWED_TEXT)
+            await message.answer(
+                texts.REQUEST_ACCESS_PROMPT_TEXT
+                if not message.from_user
+                else build_access_denied_text(auth_service, message.from_user.id)
+            )
             return
         await message.answer(texts.HELP_TEXT)
 

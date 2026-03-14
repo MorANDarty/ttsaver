@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     max_video_size_mb: int = Field(default=50, alias="MAX_VIDEO_SIZE_MB")
     cache_ttl_hours: int = Field(default=72, alias="CACHE_TTL_HOURS")
     requests_per_user_per_day: int = Field(default=20, alias="REQUESTS_PER_USER_PER_DAY")
+    access_request_cooldown_hours: int = Field(default=24, alias="ACCESS_REQUEST_COOLDOWN_HOURS")
     cleanup_max_age_hours: int = Field(default=12, alias="CLEANUP_MAX_AGE_HOURS")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     ffmpeg_path: str = Field(default="ffmpeg", alias="FFMPEG_PATH")

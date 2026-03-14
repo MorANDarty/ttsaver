@@ -6,8 +6,10 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 
 from app.config import Settings
+from app.handlers.access import build_access_router
 from app.handlers.commands import build_commands_router
 from app.handlers.links import build_links_router
+from app.services.access import AccessService
 from app.services.auth import AuthService
 from app.services.cache import CacheService
 from app.services.downloader import DownloaderService
@@ -18,6 +20,7 @@ from app.storage.db import Database
 
 @dataclass
 class AppServices:
+    access: AccessService
     auth: AuthService
     cache: CacheService
     downloader: DownloaderService
@@ -26,7 +29,12 @@ class AppServices:
 
 
 def build_services(settings: Settings, db: Database) -> AppServices:
-    auth_service = AuthService(set(settings.allowed_user_ids), set(settings.admin_user_ids))
+    access_service = AccessService(db=db, request_cooldown_hours=settings.access_request_cooldown_hours)
+    auth_service = AuthService(
+        access_service=access_service,
+        admin_user_ids=set(settings.admin_user_ids),
+        legacy_allowed_user_ids=set(settings.allowed_user_ids),
+    )
     cache_service = CacheService(db=db, ttl_hours=settings.cache_ttl_hours)
     downloader_service = DownloaderService(timeout_sec=settings.download_timeout_sec)
     media_service = MediaService(
@@ -36,6 +44,7 @@ def build_services(settings: Settings, db: Database) -> AppServices:
     )
     rate_limit_service = RateLimitService(db=db, daily_limit=settings.requests_per_user_per_day)
     return AppServices(
+        access=access_service,
         auth=auth_service,
         cache=cache_service,
         downloader=downloader_service,
@@ -53,6 +62,13 @@ def build_bot(settings: Settings) -> Bot:
 
 def build_dispatcher(settings: Settings, services: AppServices) -> Dispatcher:
     dispatcher = Dispatcher()
+    dispatcher.include_router(
+        build_access_router(
+            auth_service=services.auth,
+            access_service=services.access,
+            admin_user_ids=settings.admin_user_ids,
+        )
+    )
     dispatcher.include_router(build_commands_router(services.auth, services.cache))
     dispatcher.include_router(
         build_links_router(

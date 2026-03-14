@@ -32,8 +32,8 @@ Set these runtime environment variables in the Northflank service:
 
 ```env
 BOT_TOKEN=...
-ALLOWED_USER_IDS=123456789,987654321
 ADMIN_USER_IDS=123456789
+ACCESS_REQUEST_COOLDOWN_HOURS=24
 TEMP_DIR=./data/temp
 DB_PATH=./data/app.db
 MAX_VIDEO_SIZE_MB=50
@@ -49,7 +49,9 @@ FFMPEG_TIMEOUT_SEC=180
 Notes:
 
 - `BOT_TOKEN` should be added as a secret
-- `ALLOWED_USER_IDS` and `ADMIN_USER_IDS` can also be stored as secrets if you prefer
+- `ADMIN_USER_IDS` can also be stored as a secret if you prefer
+- user access is requested through `/req_permission` and stored in SQLite
+- `ALLOWED_USER_IDS` is optional now and should only be kept as a migration fallback
 - `DB_PATH` stays inside the container filesystem, so cache is temporary across redeploys
 
 ## Deploy Flow

@@ -26,8 +26,8 @@ Set these in Render:
 
 ```env
 BOT_TOKEN=...
-ALLOWED_USER_IDS=123456789,987654321
 ADMIN_USER_IDS=123456789
+ACCESS_REQUEST_COOLDOWN_HOURS=24
 TEMP_DIR=./data/temp
 DB_PATH=./data/app.db
 MAX_VIDEO_SIZE_MB=50
@@ -41,6 +41,12 @@ FFMPEG_TIMEOUT_SEC=180
 HEALTH_HOST=0.0.0.0
 PORT=10000
 ```
+
+Notes:
+
+- `ADMIN_USER_IDS` are the Telegram users who can approve or reject access requests.
+- User access is stored in SQLite and requested through `/req_permission`.
+- `ALLOWED_USER_IDS` is no longer required for normal operation; keep it only as a temporary migration fallback if needed.
 
 ## Keepalive
 

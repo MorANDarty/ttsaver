@@ -20,7 +20,7 @@ async def main() -> None:
 
     logger = logging.getLogger(__name__)
     logger.info(
-        "Starting bot with temp_dir=%s db_path=%s allowed_users=%d admins=%d health=%s:%d",
+        "Starting bot with temp_dir=%s db_path=%s legacy_allowed_users=%d admins=%d health=%s:%d",
         settings.temp_dir,
         settings.db_path,
         len(settings.allowed_user_ids),
